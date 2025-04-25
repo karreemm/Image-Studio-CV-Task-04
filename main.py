@@ -1,12 +1,13 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow, QComboBox ,QStackedWidget
+from PyQt5.QtWidgets import QApplication, QMainWindow, QComboBox ,QStackedWidget , QFrame, QPushButton, QLabel, QVBoxLayout
 from PyQt5.uic import loadUi
 from PyQt5.QtGui import QIcon
 from helper_functions.compile_qrc import compile_qrc
 compile_qrc()
 from icons_setup.icons import *
-
+from classes.controller import Controller
 from icons_setup.compiledIcons import *
+
 class MainWindow(QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
@@ -29,7 +30,33 @@ class MainWindow(QMainWindow):
 
         self.framesStackedWidget = self.findChild(QStackedWidget, 'framesStackedWidget')
 
+        # Browse Image Button
+        self.browse_image_button = self.findChild(QPushButton , "browse")
+        self.browse_image_button.clicked.connect(self.browse_image)
+        
+        # Segmentation Frame Setup
+        self.segmentation_input_image_frame = self.findChild(QFrame , "segmentationInputFrame")
+        self.segmentation_output_image_frame = self.findChild(QFrame , "segmentationOutputFrame")
+        
+        segmentation_frames = [self.segmentation_input_image_frame , self.segmentation_output_image_frame]
+        segmentation_labels = []
+        
+        for frame in segmentation_frames:
 
+            label = QLabel(frame)
+            layout = QVBoxLayout(frame)
+            layout.addWidget(label)
+            frame.setLayout(layout)
+            label.setScaledContents(True)
+            segmentation_labels.append(label)
+            
+        # Kmeans parameters and apply button
+        self.apply_kmeans_button = self.findChild(QPushButton, "kMeansApply")
+        self.apply_kmeans_button.clicked.connect(self.apply_kmeans)
+        
+        # Controller
+        self.controller = Controller(segmentation_labels)
+        
     def handle_mode_pages(self):
         current_index = self.modesCombobox.currentIndex()
         if current_index == 0:
@@ -59,6 +86,12 @@ class MainWindow(QMainWindow):
         elif current_index == 3:
             self.segmentationStackWidget.setCurrentIndex(3)
 
+    def apply_kmeans(self):
+        self.controller.apply_kmeans_segmentation()
+    
+    def browse_image(self):
+        self.controller.browse_input_image()
+    
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     window = MainWindow()

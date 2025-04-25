@@ -19,7 +19,7 @@ class Image():
             options = QFileDialog.Options()
             file_path, _ = QFileDialog.getOpenFileName(None, "Select Image", "", "Image Files (*.jpg *.jpeg *.png *.bmp *.gif *.tif)", options=options)
             if file_path:
-                self.input_image = cv2.imread(file_path, cv2.IMREAD_GRAYSCALE)
+                self.input_image = cv2.imread(file_path)
                 self.output_image = self.input_image.copy() # a copy of the selected image is made so we can modify it without affecting the original image
                 self.update_image_type(self.input_image) # update the selected image type
         except Exception as e:
