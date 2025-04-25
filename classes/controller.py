@@ -2,7 +2,8 @@ import cv2
 from PyQt5.QtGui import QPixmap, QImage
 from copy import deepcopy
 from classes.image import Image
-import classes.kmeans as kmeans
+from classes.kmeans import kmeans_image
+from classes.mean_shift import apply_mean_shift_segmentation_to_image
 
 class Controller():
     def __init__(self , segmentation_labels):
@@ -27,7 +28,12 @@ class Controller():
         return QPixmap.fromImage(qimage)
     
     def apply_kmeans_segmentation(self):
-        self.output_image.input_image = kmeans.kmeans_image(self.input_image.input_image , 3)
+        self.output_image.input_image = kmeans_image(self.input_image.input_image , 3)
         output_kmeans_image_qpixmap = self.numpy_to_qpixmap(self.output_image.input_image)
         self.segmentation_labels[1].setPixmap(output_kmeans_image_qpixmap)
     
+    def apply_mean_shift_segmentation(self):
+        self.output_image.input_image = apply_mean_shift_segmentation_to_image(self.input_image.input_image)
+        output_mean_shift_image_qpixmap = self.numpy_to_qpixmap(self.output_image.input_image)
+        self.segmentation_labels[1].setPixmap(output_mean_shift_image_qpixmap)
+

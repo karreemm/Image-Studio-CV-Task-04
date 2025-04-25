@@ -54,6 +54,10 @@ class MainWindow(QMainWindow):
         self.apply_kmeans_button = self.findChild(QPushButton, "kMeansApply")
         self.apply_kmeans_button.clicked.connect(self.apply_kmeans)
         
+        # Mean Shift parameters and apply button
+        self.apply_mean_shift_button = self.findChild(QPushButton , "meansShiftMethodsApply")
+        self.apply_mean_shift_button.clicked.connect(self.apply_mean_shift)
+        
         # Controller
         self.controller = Controller(segmentation_labels)
         
@@ -88,6 +92,9 @@ class MainWindow(QMainWindow):
 
     def apply_kmeans(self):
         self.controller.apply_kmeans_segmentation()
+    
+    def apply_mean_shift(self):
+        self.controller.apply_mean_shift_segmentation()
     
     def browse_image(self):
         self.controller.browse_input_image()
