@@ -271,6 +271,12 @@ QComboBox QAbstractItemView {
                     <height>300</height>
                    </size>
                   </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>16777215</width>
+                    <height>300</height>
+                   </size>
+                  </property>
                   <property name="styleSheet">
                    <string notr="true">QFrame{
 border-radius: 10px;
@@ -292,7 +298,8 @@ border: 2px solid white;
                      <property name="styleSheet">
                       <string notr="true">border: none;
 font-size: 20px;
-font-weight: bold;</string>
+font-weight: bold;
+margin-top:10px;</string>
                      </property>
                      <property name="text">
                       <string>Optimal Thresholding</string>
@@ -330,7 +337,7 @@ font-size: 16px;
 font-weight: bold;</string>
                          </property>
                          <property name="text">
-                          <string>Threshold</string>
+                          <string>Window Size (Local Only)</string>
                          </property>
                         </widget>
                        </item>
@@ -349,87 +356,6 @@ font-weight: bold;</string>
                        </item>
                        <item>
                         <widget class="QLineEdit" name="thresholdInputHarris">
-                         <property name="maximumSize">
-                          <size>
-                           <width>100</width>
-                           <height>16777215</height>
-                          </size>
-                         </property>
-                        </widget>
-                       </item>
-                      </layout>
-                     </item>
-                     <item>
-                      <layout class="QHBoxLayout" name="horizontalLayout_23">
-                       <property name="topMargin">
-                        <number>0</number>
-                       </property>
-                       <item>
-                        <widget class="QLabel" name="label_20">
-                         <property name="styleSheet">
-                          <string notr="true">border: none;
-font-size: 16px;
-font-weight: bold;</string>
-                         </property>
-                         <property name="text">
-                          <string>Params 01</string>
-                         </property>
-                        </widget>
-                       </item>
-                       <item>
-                        <spacer name="horizontalSpacer_9">
-                         <property name="orientation">
-                          <enum>Qt::Horizontal</enum>
-                         </property>
-                         <property name="sizeHint" stdset="0">
-                          <size>
-                           <width>40</width>
-                           <height>20</height>
-                          </size>
-                         </property>
-                        </spacer>
-                       </item>
-                       <item>
-                        <widget class="QLineEdit" name="sigmaInputHarris">
-                         <property name="maximumSize">
-                          <size>
-                           <width>100</width>
-                           <height>16777215</height>
-                          </size>
-                         </property>
-                        </widget>
-                       </item>
-                      </layout>
-                     </item>
-                     <item>
-                      <layout class="QHBoxLayout" name="horizontalLayout_5">
-                       <item>
-                        <widget class="QLabel" name="label_6">
-                         <property name="styleSheet">
-                          <string notr="true">border: none;
-font-size: 16px;
-font-weight: bold;</string>
-                         </property>
-                         <property name="text">
-                          <string>Params 02</string>
-                         </property>
-                        </widget>
-                       </item>
-                       <item>
-                        <spacer name="horizontalSpacer_4">
-                         <property name="orientation">
-                          <enum>Qt::Horizontal</enum>
-                         </property>
-                         <property name="sizeHint" stdset="0">
-                          <size>
-                           <width>40</width>
-                           <height>20</height>
-                          </size>
-                         </property>
-                        </spacer>
-                       </item>
-                       <item>
-                        <widget class="QLineEdit" name="windowSizeInputHaarris">
                          <property name="maximumSize">
                           <size>
                            <width>100</width>
@@ -512,6 +438,12 @@ padding: 5px;</string>
                     <height>300</height>
                    </size>
                   </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>16777215</width>
+                    <height>300</height>
+                   </size>
+                  </property>
                   <property name="styleSheet">
                    <string notr="true">QFrame{
 border-radius: 10px;
@@ -530,7 +462,8 @@ border: 2px solid white;
                      <property name="styleSheet">
                       <string notr="true">border: none;
 font-size: 20px;
-font-weight: bold;</string>
+font-weight: bold;
+margin-top:10px;</string>
                      </property>
                      <property name="text">
                       <string>Ostu Thresholding</string>
@@ -568,64 +501,12 @@ font-size: 16px;
 font-weight: bold;</string>
                          </property>
                          <property name="text">
-                          <string>Threshold</string>
+                          <string>Window Size (Local Only)</string>
                          </property>
                         </widget>
                        </item>
                        <item>
                         <widget class="QLineEdit" name="lineEdit">
-                         <property name="maximumSize">
-                          <size>
-                           <width>100</width>
-                           <height>16777215</height>
-                          </size>
-                         </property>
-                        </widget>
-                       </item>
-                      </layout>
-                     </item>
-                     <item>
-                      <layout class="QHBoxLayout" name="horizontalLayout_10">
-                       <item>
-                        <widget class="QLabel" name="label_8">
-                         <property name="styleSheet">
-                          <string notr="true">border: none;
-font-size: 16px;
-font-weight: bold;</string>
-                         </property>
-                         <property name="text">
-                          <string>Params 01</string>
-                         </property>
-                        </widget>
-                       </item>
-                       <item>
-                        <widget class="QLineEdit" name="lineEdit_2">
-                         <property name="maximumSize">
-                          <size>
-                           <width>100</width>
-                           <height>16777215</height>
-                          </size>
-                         </property>
-                        </widget>
-                       </item>
-                      </layout>
-                     </item>
-                     <item>
-                      <layout class="QHBoxLayout" name="horizontalLayout_8">
-                       <item>
-                        <widget class="QLabel" name="label_21">
-                         <property name="styleSheet">
-                          <string notr="true">border: none;
-font-size: 16px;
-font-weight: bold;</string>
-                         </property>
-                         <property name="text">
-                          <string>Params 02</string>
-                         </property>
-                        </widget>
-                       </item>
-                       <item>
-                        <widget class="QLineEdit" name="lineEdit_3">
                          <property name="maximumSize">
                           <size>
                            <width>100</width>
@@ -726,7 +607,8 @@ border: 2px solid white;
                      <property name="styleSheet">
                       <string notr="true">border: none;
 font-size: 20px;
-font-weight: bold;</string>
+font-weight: bold;
+margin-top:10px;</string>
                      </property>
                      <property name="text">
                       <string>Spectral Thresholding</string>
@@ -764,7 +646,7 @@ font-size: 16px;
 font-weight: bold;</string>
                          </property>
                          <property name="text">
-                          <string>Threshold</string>
+                          <string># of Classes (Modes)</string>
                          </property>
                         </widget>
                        </item>
@@ -790,7 +672,7 @@ font-size: 16px;
 font-weight: bold;</string>
                          </property>
                          <property name="text">
-                          <string>Params 01</string>
+                          <string>Histogram Gaussian σ </string>
                          </property>
                         </widget>
                        </item>
@@ -816,7 +698,7 @@ font-size: 16px;
 font-weight: bold;</string>
                          </property>
                          <property name="text">
-                          <string>Params 02</string>
+                          <string>Window Size (Local Only)</string>
                          </property>
                         </widget>
                        </item>

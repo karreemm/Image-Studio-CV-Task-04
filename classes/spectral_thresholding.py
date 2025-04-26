@@ -3,17 +3,17 @@ import cv2
 from scipy import ndimage
 
 class SpectralThresholding:
-    def __init__(self, mode):
-        self.mode = mode.lower()
-        if self.mode not in ['global', 'local']:
-            raise ValueError("Mode must be 'global' or 'local'")
+    
+    def __init__(self):
+        pass
         
-    def global_otsu_multithreshold( image, 
-                                    num_classes = 3,
-                                    smoothing_sigma = 1.0):
-        
+    def global_otsu_multithreshold( self,
+                                    image: np.ndarray, 
+                                    num_classes: int = 3,
+                                    smoothing_sigma: float = 1.0) -> np.ndarray:
+
         if len(image.shape) > 2:
-            raise ValueError("Input image must be grayscale")
+            image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         
         # Compute global histogram
         hist_global = cv2.calcHist([image], [0], None, [256], [0, 256]).flatten()
@@ -47,11 +47,11 @@ class SpectralThresholding:
                     max_variance = variance
                     optimal_threshold = t
             
-            return [optimal_threshold], max_variance
+            return self.segment_image(image, [optimal_threshold])
         
         # For multiple classes
         max_variance = 0
-        thresholds = []
+        final_thresholds = []
         
         def calculate_variance(t_list):
             t_list = sorted(t_list)
@@ -102,16 +102,21 @@ class SpectralThresholding:
                     if variance > max_variance:
                         max_variance = variance
                         best_t = t
+                        final_thresholds = temp_thresholds.copy()
                 thresholds[i] = best_t
         
-        return sorted(thresholds), max_variance
+        # Return segmented image directly
+        return self.segment_image(image, final_thresholds)
     
 
-    def local_otsu_multithreshold(  image, 
+    def local_otsu_multithreshold(  self,
+                                    image, 
                                     num_classes = 3,
                                     window_size= 3,  
-                                    smoothing_sigma = 1.0,
-                                    min_prominence = 0.1):
+                                    smoothing_sigma = 1.0,):
+
+        if len(image.shape) > 2:
+            image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
         if window_size % 2 == 0:
             raise ValueError("Window size must be odd")
@@ -141,13 +146,8 @@ class SpectralThresholding:
                 
                 for k in range(1, 255):
                     if smoothed_hist[k] > smoothed_hist[k-1] and smoothed_hist[k] > smoothed_hist[k+1]:
-                        prominence = min(
-                            smoothed_hist[k] - np.min(smoothed_hist[max(0, k-10):k]),
-                            smoothed_hist[k] - np.min(smoothed_hist[k+1:min(256, k+11)])
-                        )
-                        if prominence > min_prominence * np.max(smoothed_hist):
-                            peaks.append(k)
-                            peak_heights.append(smoothed_hist[k])
+                        peaks.append(k)
+                        peak_heights.append(smoothed_hist[k])
                 
                 # Select strongest peaks and find thresholds
                 if len(peaks) >= num_classes:
@@ -174,7 +174,7 @@ class SpectralThresholding:
         
         return result
 
-    def segment_image(image, thresholds):
+    def segment_image(self, image, thresholds):
 
         segmented = np.zeros_like(image)
         thresholds = sorted(thresholds)
@@ -188,12 +188,4 @@ class SpectralThresholding:
         segmented[image > thresholds[-1]] = len(thresholds)
         return segmented
     
-    def apply_thresholding(self, image, num_classes=3, window_size=3, smoothing_sigma=1.0, min_prominence=0.1):
-        if self.mode == 'global':
-            thresholds, _ = self.global_otsu_multithreshold(image, num_classes, smoothing_sigma)
-            result = self.segment_image(image, thresholds)
-        elif self.mode == 'local':
-            result = self.local_otsu_multithreshold(image, num_classes, window_size, smoothing_sigma, min_prominence)
-        
-        return result
 

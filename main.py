@@ -74,6 +74,22 @@ class MainWindow(QMainWindow):
         self.otsu_thresholding_apply_button = self.findChild(QPushButton, "ostuThresholdingApply")
         self.otsu_thresholding_apply_button.clicked.connect(self.apply_thresholding)
 
+        # spectral thresholding inputs
+        self.num_classes_spectral = self.findChild(QLineEdit, "lineEdit_4")
+        self.num_classes_spectral.setText("3")
+        self.num_classes_spectral.textChanged.connect(self.handle_spectral_thresholding_params)
+
+        self.smoothing_sigma_spectral = self.findChild(QLineEdit, "lineEdit_5")
+        self.smoothing_sigma_spectral.setText("1.0")
+        self.smoothing_sigma_spectral.textChanged.connect(self.handle_spectral_thresholding_params)
+
+        self.window_size_spectral = self.findChild(QLineEdit, "lineEdit_6")
+        self.window_size_spectral.setText("3")
+        self.window_size_spectral.textChanged.connect(self.handle_spectral_thresholding_params)
+
+        self.spectral_thresholding_apply_button = self.findChild(QPushButton, "spectralThresholdingApply")
+        self.spectral_thresholding_apply_button.clicked.connect(self.apply_spectral_thresholding)
+
         # Initialize the thresholding mode
         self.thresholding_mode = "global"
 
@@ -182,6 +198,36 @@ class MainWindow(QMainWindow):
             self.controller.apply_thresholding("optimal", self.thresholding_mode, block_size)
         else:
             print(f"Error: Unsupported thresholding technique '{thresholding_technique}'.")
+
+    def apply_spectral_thresholding(self):
+
+        if self.controller.input_image.input_image is None:
+            print("Error: No input image loaded. Please load an image first.")
+            return
+
+        # Get the parameters from the input fields
+        num_classes = int(self.num_classes_spectral.text())
+        smoothing_sigma = float(self.smoothing_sigma_spectral.text())
+        window_size = int(self.window_size_spectral.text())
+
+        self.controller.apply_spectral_thresholding(self.thresholding_mode, num_classes, smoothing_sigma, window_size)
+
+    def handle_spectral_thresholding_params(self):
+        """
+        Handle changes in the spectral thresholding parameters and update the input fields accordingly.
+        """
+        try:
+            num_classes = int(self.num_classes_spectral.text())
+            smoothing_sigma = float(self.smoothing_sigma_spectral.text())
+            window_size = int(self.window_size_spectral.text())
+
+            # Validate the parameters
+            if num_classes <= 0 or smoothing_sigma <= 0 or window_size <= 0:
+                raise ValueError("Parameters must be positive.")
+
+        except ValueError:
+            print("Error: Invalid parameters. Please enter positive values.")
+            return
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

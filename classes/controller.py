@@ -7,6 +7,7 @@ from classes.kmeans import kmeans_image
 from classes.mean_shift import apply_mean_shift_segmentation_to_image
 from classes.optimal_thresholding import OptimalThresholding 
 from classes.otsu_thresholding import OtsuThresholding
+from classes.spectral_thresholding import SpectralThresholding
 
 class Controller():
     def __init__(self, segmentation_labels, thresholding_labels):
@@ -14,6 +15,7 @@ class Controller():
         self.output_image = Image()
         self.segmentation_labels = segmentation_labels
         self.thresholding_labels = thresholding_labels
+        self.spectral_thresholding = SpectralThresholding() 
     
     def browse_input_image(self, target="segmentation"):
         """
@@ -97,6 +99,32 @@ class Controller():
         # Convert the output image to QPixmap and display it
         output_threshold_image_qpixmap = self.numpy_to_qpixmap(cv2.cvtColor(self.output_image.input_image, cv2.COLOR_GRAY2RGB))
         self.thresholding_labels[1].setPixmap(output_threshold_image_qpixmap)
+
+    def apply_spectral_thresholding(self, mode, num_classes=3, smoothing_sigma=1.0, window_size=3):
+        if mode == 'global':
+            result_image = self.spectral_thresholding.global_otsu_multithreshold(
+                image=self.input_image.input_image, 
+                num_classes=num_classes, 
+                smoothing_sigma=smoothing_sigma
+            )
+        elif mode == 'local':
+            result_image = self.spectral_thresholding.local_otsu_multithreshold(
+                image=self.input_image.input_image, 
+                num_classes=num_classes, 
+                window_size=window_size, 
+                smoothing_sigma=smoothing_sigma
+            )
+
+        # Apply colormap to the result image
+        result_colored = cv2.applyColorMap(
+            cv2.normalize(result_image, None, 0, 255, cv2.NORM_MINMAX, cv2.CV_8U),
+            cv2.COLORMAP_JET  # Similar to nipy_spectral
+        )
+        
+        # Convert to RGB for display
+        output_spectral_image_qpixmap = self.numpy_to_qpixmap(result_colored)
+        self.thresholding_labels[1].setPixmap(output_spectral_image_qpixmap)
+        
 
     def update_label(self, label, image_array):
         """
