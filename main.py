@@ -1,5 +1,5 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow, QComboBox ,QStackedWidget , QFrame, QPushButton, QLabel, QVBoxLayout
+from PyQt5.QtWidgets import QApplication, QMainWindow, QComboBox, QStackedWidget, QFrame, QPushButton, QLabel, QVBoxLayout, QRadioButton, QLineEdit
 from PyQt5.uic import loadUi
 from PyQt5.QtGui import QIcon
 from helper_functions.compile_qrc import compile_qrc
@@ -57,9 +57,43 @@ class MainWindow(QMainWindow):
         # Mean Shift parameters and apply button
         self.apply_mean_shift_button = self.findChild(QPushButton , "meansShiftMethodsApply")
         self.apply_mean_shift_button.clicked.connect(self.apply_mean_shift)
+
+        # Optimal Thresholding Radio Buttons
+        self.global_thresholding_radiobutton = self.findChild(QRadioButton, "globalThresholdingRadiobutton")
+        self.local_thresholding_radiobutton = self.findChild(QRadioButton, "localThresholdingRadiobutton")
+
+        # Connect radio buttons to update the selected mode
+        self.global_thresholding_radiobutton.clicked.connect(self.set_global_thresholding_mode)
+        self.local_thresholding_radiobutton.clicked.connect(self.set_local_thresholding_mode)
+
+        # Optimal Thresholding Apply Button
+        self.optimal_thresholding_apply_button = self.findChild(QPushButton, "optimalThresholdingApply")
+        self.optimal_thresholding_apply_button.clicked.connect(self.apply_thresholding)
+
+        # Otsu Thresholding Apply Button
+        self.otsu_thresholding_apply_button = self.findChild(QPushButton, "ostuThresholdingApply")
+        self.otsu_thresholding_apply_button.clicked.connect(self.apply_thresholding)
+
+        # Initialize the thresholding mode
+        self.thresholding_mode = "global"
+
+        # Thresholding Frame Setup
+        self.thresholding_input_image_frame = self.findChild(QFrame, "thresholdingInputFrame")
+        self.thresholding_output_image_frame = self.findChild(QFrame, "thresholdingOutputFrame")
         
+        thresholding_frames = [self.thresholding_input_image_frame, self.thresholding_output_image_frame]
+        thresholding_labels = []
+        
+        for frame in thresholding_frames:
+            label = QLabel(frame)
+            layout = QVBoxLayout(frame)
+            layout.addWidget(label)
+            frame.setLayout(layout)
+            label.setScaledContents(True)
+            thresholding_labels.append(label)
+
         # Controller
-        self.controller = Controller(segmentation_labels)
+        self.controller = Controller(segmentation_labels, thresholding_labels)
         
     def handle_mode_pages(self):
         current_index = self.modesCombobox.currentIndex()
@@ -97,10 +131,60 @@ class MainWindow(QMainWindow):
         self.controller.apply_mean_shift_segmentation()
     
     def browse_image(self):
-        self.controller.browse_input_image()
-    
+        """
+        Browse and load an image, updating the input image area based on the selected mode.
+        """
+        current_mode_index = self.modesCombobox.currentIndex()
+        
+        if current_mode_index == 0:  # Thresholding mode
+            self.controller.browse_input_image(target="thresholding")
+        elif current_mode_index == 1:  # Segmentation mode
+            self.controller.browse_input_image(target="segmentation")
+
+    def set_global_thresholding_mode(self):
+        """Set the thresholding mode to global."""
+        self.thresholding_mode = "global"
+
+    def set_local_thresholding_mode(self):
+        """Set the thresholding mode to local."""
+        self.thresholding_mode = "local"
+
+    def apply_thresholding(self):
+        """
+        Apply the selected thresholding technique (Otsu or Optimal) in the selected mode (Global or Local).
+        """
+        if self.controller.input_image.input_image is None:
+            print("Error: No input image loaded. Please load an image first.")
+            return
+
+        # Get the selected thresholding technique from the combobox
+        thresholding_technique = self.thresholdingComboBox.currentText().strip().lower()
+
+        # Get the block size from the "Threshold" input area if in local mode
+        block_size = None
+        if self.thresholding_mode == "local":
+            if thresholding_technique == "optimal":
+                threshold_input = self.findChild(QLineEdit, "thresholdInputHarris").text()
+            elif thresholding_technique == "otsu":
+                threshold_input = self.findChild(QLineEdit, "lineEdit").text()
+            try:
+                block_size = int(threshold_input)  # Dynamically fetch the block size
+                if block_size <= 0:
+                    raise ValueError
+            except ValueError:
+                print("Error: Invalid block size. Please enter a positive integer.")
+                return
+
+                # Trigger the appropriate thresholding logic in the Controller
+        if thresholding_technique == "otsu":
+            self.controller.apply_thresholding("otsu", self.thresholding_mode, block_size)
+        elif thresholding_technique == "optimal":
+            self.controller.apply_thresholding("optimal", self.thresholding_mode, block_size)
+        else:
+            print(f"Error: Unsupported thresholding technique '{thresholding_technique}'.")
+
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     window = MainWindow()
     window.show()
-    sys.exit(app.exec_())   
+    sys.exit(app.exec_())
