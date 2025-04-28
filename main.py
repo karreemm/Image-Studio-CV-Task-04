@@ -90,6 +90,13 @@ class MainWindow(QMainWindow):
         self.spectral_thresholding_apply_button = self.findChild(QPushButton, "spectralThresholdingApply")
         self.spectral_thresholding_apply_button.clicked.connect(self.apply_spectral_thresholding)
 
+        # optimal and otsu thesholding inputs
+        self.optimal_area = self.findChild(QLineEdit, "thresholdInputHarris")
+        self.optimal_area.setText("65")
+
+        self.otsu_area = self.findChild(QLineEdit, "lineEdit")
+        self.otsu_area.setText("65")
+
         # Initialize the thresholding mode
         self.thresholding_mode = "global"
 
@@ -180,9 +187,11 @@ class MainWindow(QMainWindow):
         block_size = None
         if self.thresholding_mode == "local":
             if thresholding_technique == "optimal":
-                threshold_input = self.findChild(QLineEdit, "thresholdInputHarris").text()
+                # threshold_input = self.findChild(QLineEdit, "thresholdInputHarris").text()
+                threshold_input = self.optimal_area.text()
             elif thresholding_technique == "otsu":
-                threshold_input = self.findChild(QLineEdit, "lineEdit").text()
+                # threshold_input = self.findChild(QLineEdit, "lineEdit").text()
+                threshold_input = self.otsu_area.text()
             try:
                 block_size = int(threshold_input)  # Dynamically fetch the block size
                 if block_size <= 0:

@@ -72,6 +72,7 @@ class OtsuThresholding:
             # Calculate between-class variance
             # σ²_B = P₁(m₁ - m_G)² + P₂(m₂ - m_G)²
             # a simplified equivalent form of it:
+            # P₁ * P₂ * (m₁ - m₂) ** 2
             class_variance = weight_background * weight_object * (mean_background - mean_foreground)**2 
             
             # Keep track of best threshold
