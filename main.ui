@@ -828,6 +828,19 @@ font-weight: bold;</string>
                    </widget>
                   </item>
                   <item>
+                   <spacer name="horizontalSpacer_3">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                  <item>
                    <widget class="QRadioButton" name="localThresholdingRadiobutton">
                     <property name="styleSheet">
                      <string notr="true">border: none;
@@ -1020,7 +1033,7 @@ font-size: 16px;
 font-weight: bold;</string>
                          </property>
                          <property name="text">
-                          <string>Params 01</string>
+                          <string>Max Iterations</string>
                          </property>
                         </widget>
                        </item>
@@ -1059,7 +1072,7 @@ font-size: 16px;
 font-weight: bold;</string>
                          </property>
                          <property name="text">
-                          <string>Params 02</string>
+                          <string># of Classes</string>
                          </property>
                         </widget>
                        </item>
@@ -1077,7 +1090,7 @@ font-weight: bold;</string>
                         </spacer>
                        </item>
                        <item>
-                        <widget class="QLineEdit" name="numberOfOcatvesInputSift">
+                        <widget class="QLineEdit" name="numOfClassesKMean">
                          <property name="maximumSize">
                           <size>
                            <width>100</width>
@@ -1210,12 +1223,12 @@ font-size: 16px;
 font-weight: bold;</string>
                          </property>
                          <property name="text">
-                          <string>Params 01</string>
+                          <string># of Seeds </string>
                          </property>
                         </widget>
                        </item>
                        <item>
-                        <widget class="QLineEdit" name="lineEdit_7">
+                        <widget class="QLineEdit" name="numOfSeeds">
                          <property name="maximumSize">
                           <size>
                            <width>100</width>
@@ -1236,12 +1249,12 @@ font-size: 16px;
 font-weight: bold;</string>
                          </property>
                          <property name="text">
-                          <string>Params 02</string>
+                          <string>Threshold</string>
                          </property>
                         </widget>
                        </item>
                        <item>
-                        <widget class="QLineEdit" name="lineEdit_8">
+                        <widget class="QLineEdit" name="thresholdRegionGrowing">
                          <property name="maximumSize">
                           <size>
                            <width>100</width>
@@ -1380,38 +1393,12 @@ font-size: 16px;
 font-weight: bold;</string>
                          </property>
                          <property name="text">
-                          <string>Params 01</string>
+                          <string># of Classes</string>
                          </property>
                         </widget>
                        </item>
                        <item>
-                        <widget class="QLineEdit" name="lineEdit_9">
-                         <property name="maximumSize">
-                          <size>
-                           <width>100</width>
-                           <height>16777215</height>
-                          </size>
-                         </property>
-                        </widget>
-                       </item>
-                      </layout>
-                     </item>
-                     <item>
-                      <layout class="QHBoxLayout" name="horizontalLayout_36">
-                       <item>
-                        <widget class="QLabel" name="label_33">
-                         <property name="styleSheet">
-                          <string notr="true">border: none;
-font-size: 16px;
-font-weight: bold;</string>
-                         </property>
-                         <property name="text">
-                          <string>Params 02</string>
-                         </property>
-                        </widget>
-                       </item>
-                       <item>
-                        <widget class="QLineEdit" name="lineEdit_10">
+                        <widget class="QLineEdit" name="numOfClassesAgglomerative">
                          <property name="maximumSize">
                           <size>
                            <width>100</width>
@@ -1550,12 +1537,12 @@ font-size: 16px;
 font-weight: bold;</string>
                          </property>
                          <property name="text">
-                          <string>Params 01</string>
+                          <string>Bandwidth</string>
                          </property>
                         </widget>
                        </item>
                        <item>
-                        <widget class="QLineEdit" name="lineEdit_11">
+                        <widget class="QLineEdit" name="bandwidthMeanShift">
                          <property name="maximumSize">
                           <size>
                            <width>100</width>
@@ -1576,12 +1563,12 @@ font-size: 16px;
 font-weight: bold;</string>
                          </property>
                          <property name="text">
-                          <string>Params 02</string>
+                          <string>Threshold</string>
                          </property>
                         </widget>
                        </item>
                        <item>
-                        <widget class="QLineEdit" name="lineEdit_12">
+                        <widget class="QLineEdit" name="thresholdMeanShift">
                          <property name="maximumSize">
                           <size>
                            <width>100</width>

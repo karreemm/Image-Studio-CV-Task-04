@@ -7,6 +7,7 @@ compile_qrc()
 from icons_setup.icons import *
 from classes.controller import Controller
 from icons_setup.compiledIcons import *
+from classes.clickable_label import ClickableLabel
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -43,7 +44,7 @@ class MainWindow(QMainWindow):
         
         for frame in segmentation_frames:
 
-            label = QLabel(frame)
+            label = ClickableLabel(frame)
             layout = QVBoxLayout(frame)
             layout.addWidget(label)
             frame.setLayout(layout)
@@ -115,6 +116,15 @@ class MainWindow(QMainWindow):
             label.setScaledContents(True)
             thresholding_labels.append(label)
 
+        # Initialize Region Growing parameters
+        # self.region_growing_threshold_in
+        self.apply_region_growing_button = self.findChild(QPushButton , "regionGrowingApply")
+        self.apply_region_growing_button.clicked.connect(self.apply_region_growing)
+        
+        # Initialize the reset button
+        self.reset_button = self.findChild(QPushButton , "reset")
+        self.reset_button.clicked.connect(self.reset_)       
+        
         # Controller
         self.controller = Controller(segmentation_labels, thresholding_labels)
         
@@ -238,7 +248,11 @@ class MainWindow(QMainWindow):
             print("Error: Invalid parameters. Please enter positive values.")
             return
 
+    def apply_region_growing(self):
+        self.controller.apply_region_growing()
     
+    def reset_(self):
+        self.controller.reset()
     
 if __name__ == '__main__':
     app = QApplication(sys.argv)

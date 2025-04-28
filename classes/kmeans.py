@@ -158,7 +158,7 @@ def apply_specific_colors(height , width, labels, specific_colors):
     
 #     return [list(c) for c in colors]
 
-def kmeans_image(image, k, specific_colors=None, max_iterations=20, tolerance=0.001):
+def kmeans_image(image, k, seed_points,specific_colors=None, max_iterations=20, tolerance=0.001):
     """
     Apply K-means clustering to an image and color each cluster with specific colors.
     
@@ -186,8 +186,12 @@ def kmeans_image(image, k, specific_colors=None, max_iterations=20, tolerance=0.
     height, width = image.shape
     # Reshape L channel to a 1D array of pixels
     pixels = image.reshape(-1, 1) 
+    
     # Initialize centroids
-    centroids = initialize_centroids(pixels, k)
+    if (len(seed_points) == 0):
+        centroids = initialize_centroids(pixels, k)
+    else:
+        centroids = pixels[seed_points]
     
     # Keep track of previous centroids for convergence check
     prev_centroids = np.zeros_like(centroids)

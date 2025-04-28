@@ -8,7 +8,7 @@ from classes.mean_shift import apply_mean_shift_segmentation_to_image
 from classes.optimal_thresholding import OptimalThresholding 
 from classes.otsu_thresholding import OtsuThresholding
 from classes.spectral_thresholding import SpectralThresholding
-
+from classes.RegionGrowing import RegionGrowingSegmentation
 class Controller():
     def __init__(self, segmentation_labels, thresholding_labels):
         self.input_image = Image() 
@@ -16,6 +16,7 @@ class Controller():
         self.segmentation_labels = segmentation_labels
         self.thresholding_labels = thresholding_labels
         self.spectral_thresholding = SpectralThresholding() 
+        self.region_growing = RegionGrowingSegmentation()
     
     def browse_input_image(self, target="segmentation"):
         """
@@ -57,9 +58,13 @@ class Controller():
         return QPixmap.fromImage(qimage)
     
     def apply_kmeans_segmentation(self):
+        
         image = cv2.cvtColor(self.input_image.input_image, cv2.COLOR_RGB2LUV)
         image_L_channel = image[:,:,0] 
-        self.output_image.input_image = kmeans_image(image_L_channel , 3)
+        seed_points = []
+        for point in self.segmentation_labels[0].get_points():
+            seed_points.append((point[1], point[0]))
+        self.output_image.input_image = kmeans_image(image_L_channel , 3 , seed_points)
         output_kmeans_image_qpixmap = self.numpy_to_qpixmap(self.output_image.input_image)
         self.segmentation_labels[1].setPixmap(output_kmeans_image_qpixmap)
     
@@ -147,3 +152,18 @@ class Controller():
         label.setPixmap(pixmap)
         label.setScaledContents(True)
 
+    def apply_region_growing(self):
+        seed_points = []
+        for point in self.segmentation_labels[0].get_points():
+            seed_points.append((point[1], point[0]))
+        image = cv2.cvtColor(self.input_image.input_image, cv2.COLOR_RGB2LUV)
+        image_L_channel = image[:,:,0] 
+        self.output_image.input_image = self.region_growing.segment(image_L_channel , seed_points , 10)
+        output_mean_shift_image_qpixmap = self.numpy_to_qpixmap(self.output_image.input_image)
+        self.segmentation_labels[1].setPixmap(output_mean_shift_image_qpixmap)
+        
+    def reset(self):
+        self.output_image.input_image = self.input_image.input_image
+        self.update_label(self.segmentation_labels[1] , self.output_image.input_image)
+        self.update_label(self.thresholding_labels[1] , self.output_image.input_image)
+        self.segmentation_labels[0].clear_points()
