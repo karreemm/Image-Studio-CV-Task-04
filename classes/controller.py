@@ -57,21 +57,21 @@ class Controller():
 
         return QPixmap.fromImage(qimage)
     
-    def apply_kmeans_segmentation(self):
+    def apply_kmeans_segmentation(self , num_classes=3 , tolerance=0.01 , max_iter=20):
         
         image = cv2.cvtColor(self.input_image.input_image, cv2.COLOR_RGB2LUV)
         image_L_channel = image[:,:,0] 
         seed_points = []
         for point in self.segmentation_labels[0].get_points():
             seed_points.append((point[1], point[0]))
-        self.output_image.input_image = kmeans_image(image_L_channel , 3 , seed_points)
+        self.output_image.input_image = kmeans_image(image_L_channel , num_classes , seed_points , tolerance=tolerance , max_iter=max_iter)
         output_kmeans_image_qpixmap = self.numpy_to_qpixmap(self.output_image.input_image)
         self.segmentation_labels[1].setPixmap(output_kmeans_image_qpixmap)
     
-    def apply_mean_shift_segmentation(self):
+    def apply_mean_shift_segmentation(self , bandwith , threshold):
         image = cv2.cvtColor(self.input_image.input_image, cv2.COLOR_RGB2LUV)
         image_L_channel = image[:,:,0] 
-        self.output_image.input_image = apply_mean_shift_segmentation_to_image(image_L_channel)
+        self.output_image.input_image = apply_mean_shift_segmentation_to_image(image_L_channel , bandwith , threshold)
         output_mean_shift_image_qpixmap = self.numpy_to_qpixmap(self.output_image.input_image)
         self.segmentation_labels[1].setPixmap(output_mean_shift_image_qpixmap)
     
@@ -152,13 +152,13 @@ class Controller():
         label.setPixmap(pixmap)
         label.setScaledContents(True)
 
-    def apply_region_growing(self):
+    def apply_region_growing(self , threshold):
         seed_points = []
         for point in self.segmentation_labels[0].get_points():
             seed_points.append((point[1], point[0]))
         image = cv2.cvtColor(self.input_image.input_image, cv2.COLOR_RGB2LUV)
         image_L_channel = image[:,:,0] 
-        self.output_image.input_image = self.region_growing.segment(image_L_channel , seed_points , 10)
+        self.output_image.input_image = self.region_growing.segment(image_L_channel , seed_points , threshold)
         output_mean_shift_image_qpixmap = self.numpy_to_qpixmap(self.output_image.input_image)
         self.segmentation_labels[1].setPixmap(output_mean_shift_image_qpixmap)
         
