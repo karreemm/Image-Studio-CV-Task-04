@@ -24,7 +24,7 @@ class ClickableLabel(QLabel):
             img_x = int(x * scale_x)
             img_y = int(y * scale_y)
 
-            # print(f"Clicked at label ({x}, {y}), mapped to image ({img_x}, {img_y})")
+            print(f"Clicked at label ({x}, {y}), mapped to image ({img_x}, {img_y})")
 
             self.points.append((img_x, img_y))
             self.update()

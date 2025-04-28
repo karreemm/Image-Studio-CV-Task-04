@@ -114,6 +114,10 @@ class MainWindow(QMainWindow):
         self.apply_region_growing_button = self.findChild(QPushButton , "regionGrowingApply")
         self.apply_region_growing_button.clicked.connect(self.apply_region_growing)
         
+        # Initialize the reset button
+        self.reset_button = self.findChild(QPushButton , "reset")
+        self.reset_button.clicked.connect(self.reset_)       
+        
         # Controller
         self.controller = Controller(segmentation_labels, thresholding_labels)
         
@@ -238,6 +242,8 @@ class MainWindow(QMainWindow):
     def apply_region_growing(self):
         self.controller.apply_region_growing()
     
+    def reset_(self):
+        self.controller.reset()
     
 if __name__ == '__main__':
     app = QApplication(sys.argv)

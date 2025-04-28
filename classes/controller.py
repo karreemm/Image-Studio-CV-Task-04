@@ -149,9 +149,17 @@ class Controller():
         label.setScaledContents(True)
 
     def apply_region_growing(self):
-        seed_points = self.segmentation_labels[0].get_points()
+        seed_points = []
+        for point in self.segmentation_labels[0].get_points():
+            seed_points.append((point[1], point[0]))
         image = cv2.cvtColor(self.input_image.input_image, cv2.COLOR_RGB2LUV)
         image_L_channel = image[:,:,0] 
         self.output_image.input_image = self.region_growing.segment(image_L_channel , seed_points , 10)
         output_mean_shift_image_qpixmap = self.numpy_to_qpixmap(self.output_image.input_image)
         self.segmentation_labels[1].setPixmap(output_mean_shift_image_qpixmap)
+        
+    def reset(self):
+        self.output_image.input_image = self.input_image.input_image
+        self.update_label(self.segmentation_labels[1] , self.output_image.input_image)
+        self.update_label(self.thresholding_labels[1] , self.output_image.input_image)
+        self.segmentation_labels[0].clear_points()
