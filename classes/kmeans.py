@@ -62,65 +62,6 @@ def update_centroids(data, labels, k):
     return new_centroids
 
 
-# def kmeans_image(image, k, max_iterations=100, tolerance=1e-4):
-#     """
-#     Apply K-means clustering to an image.
-    
-#     Parameters:
-#     - image: numpy array of shape (height, width, channels)
-#     - k: number of clusters (colors)
-#     - max_iterations: maximum number of iterations to run
-#     - tolerance: convergence threshold for centroid movement
-    
-#     Returns:
-#     - clustered_image: image with each pixel replaced by its cluster's color
-#     - centroids: final cluster centroids (colors)
-#     - iterations: number of iterations run
-#     """
-#     # Reshape image to a 2D array of pixels
-#     height, width, channels = image.shape
-#     pixels = image.reshape(-1, channels)
-    
-#     # Initialize centroids
-#     centroids = initialize_centroids(pixels, k)
-    
-#     # Keep track of previous centroids for convergence check
-#     prev_centroids = np.zeros_like(centroids)
-    
-#     # Initialize variables
-#     iterations = 0
-#     converged = False
-    
-#     while not converged and iterations < max_iterations:
-#         # Assign points to clusters
-#         labels = assign_clusters(pixels, centroids)
-        
-#         # Store current centroids for convergence check
-#         prev_centroids = centroids.copy()
-        
-#         # Update centroids based on current assignments
-#         centroids = update_centroids(pixels, labels, k)
-        
-#         # Check for convergence
-#         centroid_movement = np.sum([euclidean_distance(prev_centroids[i], centroids[i]) for i in range(k)])
-#         converged = centroid_movement < tolerance
-        
-#         # Increment iteration counter
-#         iterations += 1
-        
-#         print(f"Iteration {iterations}, centroid movement: {centroid_movement:.6f}")
-    
-#     # Replace each pixel with its cluster's centroid color
-#     clustered_pixels = np.array([centroids[label] for label in labels])
-    
-#     # Reshape back to original image dimensions
-#     clustered_image = clustered_pixels.reshape(height, width, channels)
-    
-#     # Ensure the values are in valid image range [0, 255]
-#     clustered_image = np.clip(clustered_image, 0, 255).astype(np.uint8)
-    
-#     return clustered_image, centroids, iterations
-
 
 def apply_specific_colors(height , width, labels, specific_colors):
     """
@@ -149,14 +90,6 @@ def apply_specific_colors(height , width, labels, specific_colors):
 
     return colored_image
 
-# def generate_unique_random_colors(n):
-#     colors = set()
-    
-#     while len(colors) < n:
-#         color = tuple(random.randint(0, 255) for _ in range(3))
-#         colors.add(color)
-    
-#     return [list(c) for c in colors]
 
 def kmeans_image(image, k, seed_points,specific_colors=None, max_iterations=20, tolerance=0.001):
     """
@@ -230,73 +163,3 @@ def kmeans_image(image, k, seed_points,specific_colors=None, max_iterations=20, 
     
     return segmented_image
 
-
-# # Example usage
-# if __name__ == "__main__":
-#     # Load an image
-#     try:
-#         # You can replace this with your own image path
-#         img = Image.open("./Final Test Data/tiger2.jpg")
-#         img = img.resize((300, 300))  # Resize for faster processing
-#         image = np.array(img)
-#     except:
-#         # If no image is available, create a simple synthetic image
-#         print("No image found, creating a synthetic image")
-#         # Create a simple synthetic image with gradients
-#         x = np.linspace(0, 1, 300)
-#         y = np.linspace(0, 1, 300)
-#         xx, yy = np.meshgrid(x, y)
-        
-#         # Create RGB channels
-#         r = np.sin(xx * 10) * 128 + 128
-#         g = np.cos(yy * 10) * 128 + 128
-#         b = np.sin((xx + yy) * 10) * 128 + 128
-        
-#         # Combine into an RGB image
-#         image = np.stack([r, g, b], axis=2).astype(np.uint8)
-    
-#     # Number of clusters (colors) to use
-#     k = 3
-    
-#     # Define specific colors for each cluster (RGB format)
-#     specific_colors = [
-#         [255, 0, 0],    # Red
-#         [0, 255, 0],    # Green
-#         [0, 0, 255],    # Blue
-#         [255, 255, 0],  # Yellow
-#         [255, 0, 255]   # Magenta
-#     ]
-    
-#     # # Apply K-means with specific colors
-#     colored_image, centroids, iterations, labels = kmeans_image_with_specific_colors(
-#         image, k, specific_colors, max_iterations=10)
-    
-#     # Apply K-means with centroid colors
-#     # clustered_image, centroids, iterations = kmeans_image(
-#     #     image, k, max_iterations=20)
-    
-#     # Display the results
-#     plt.figure(figsize=(15, 5))
-    
-#     plt.subplot(1, 3, 1)
-#     plt.imshow(image)
-#     plt.title("Original Image")
-#     plt.axis('off')
-    
-#     # plt.subplot(1, 3, 2)
-#     # plt.imshow(clustered_image)
-#     # plt.title(f"K-means Clustered (k={k}, {iterations} iterations)")
-#     # plt.axis('off')
-    
-#     plt.subplot(1, 3, 3)
-#     plt.imshow(colored_image)
-#     plt.title(f"K-means with Specific Colors (k={k})")
-#     plt.axis('off')
-    
-#     plt.tight_layout()
-#     plt.show()
-    
-#     # Print the colors of the centroids
-#     print("Centroid colors (RGB):")
-#     for i, centroid in enumerate(centroids):
-#         print(f"Cluster {i+1}: {centroid.astype(int)}")

@@ -54,19 +54,23 @@ class MainWindow(QMainWindow):
         # Kmeans parameters and apply button
         self.apply_kmeans_button = self.findChild(QPushButton, "kMeansApply")
         self.apply_kmeans_button.clicked.connect(self.apply_kmeans)
+        
+        # Initialize the input fields 
         self.kmeans_num_classes_input = self.findChild(QLineEdit, "numOfClassesKMean")
+        self.kmeans_max_iterations_input = self.findChild(QLineEdit, "maxIterations")
+        self.kmeans_tolerance_input = self.findChild(QLineEdit, "tolerance")
+        
         self.kmeans_num_classes_input.textChanged.connect(self.handle_kmeans_params)
         self.kmeans_num_classes_input.setText("3")
-        self.kmeans_num_classes = 3
         
-        self.kmeans_max_iterations_input = self.findChild(QLineEdit, "sigmaInputSift")
         self.kmeans_max_iterations_input.textChanged.connect(self.handle_kmeans_params)
         self.kmeans_max_iterations_input.setText("20")
-        self.kmeans_max_iterations = 20
         
-        self.kmeans_tolerance_input = self.findChild(QLineEdit, "tolerance")
         self.kmeans_tolerance_input.textChanged.connect(self.handle_kmeans_params)
         self.kmeans_tolerance_input.setText("0.01")
+        
+        self.kmeans_num_classes = 3
+        self.kmeans_max_iterations = 20
         self.kmeans_tolerance = 0.01
         
         # Mean Shift parameters and apply button
@@ -145,22 +149,35 @@ class MainWindow(QMainWindow):
         self.apply_region_growing_button = self.findChild(QPushButton , "regionGrowingApply")
         self.apply_region_growing_button.clicked.connect(self.apply_region_growing)
         
-        self.region_growing_seeds = self.findChild(QLineEdit , "numOfSeeds")
-        self.region_growing_seeds.setText("2")
-        self.region_growing_seeds.textChanged.connect(self.handle_region_growing_params)
+        self.region_growing_seeds_input = self.findChild(QLineEdit , "numOfSeeds")
+        self.region_growing_seeds_input.setText("2")
+        self.region_growing_seeds_input.textChanged.connect(self.handle_region_growing_params)
         self.region_growing_seeds = 2
         
-        self.region_growing_threshold = self.findChild(QLineEdit , "thresholdRegionGrowing")
-        self.region_growing_threshold.setText("25")
-        self.region_growing_threshold.textChanged.connect(self.handle_region_growing_params)
+        self.region_growing_threshold_input = self.findChild(QLineEdit , "thresholdRegionGrowing")
+        self.region_growing_threshold_input.setText("25")
+        self.region_growing_threshold_input.textChanged.connect(self.handle_region_growing_params)
         self.region_growing_threshold = 25
         
         # Initialize the reset button
         self.reset_button = self.findChild(QPushButton , "reset")
         self.reset_button.clicked.connect(self.reset_)       
         
+        # Initialize agg cluster
+        self.agg_cluster_apply_button = self.findChild(QPushButton , "agglomerativeApply")
+        self.agg_cluster_apply_button.clicked.connect(self.apply_agglomerative_clustering)
+        
+        self.agg_num_classes_input = self.findChild(QLineEdit , "numOfClassesAgglomerative")
+        self.agg_num_classes_input.setText("5")
+        self.agg_num_classes_input.textChanged.connect(self.set_agg_params)
+        self.agg_num_classes = 5
+        
+        
         # Controller
         self.controller = Controller(self.segmentation_labels, thresholding_labels)
+    
+    def apply_agglomerative_clustering(self):
+        self.controller.apply_agglomerative_clustering(self.agg_num_classes)
         
     def handle_mode_pages(self):
         current_index = self.modesCombobox.currentIndex()
@@ -283,7 +300,7 @@ class MainWindow(QMainWindow):
             return
 
     def apply_region_growing(self):
-        self.controller.apply_region_growing(self.region_growing_seeds , self.region_growing_threshold )
+        self.controller.apply_region_growing(self.region_growing_threshold )
     
     def reset_(self):
         self.controller.reset()
@@ -296,7 +313,7 @@ class MainWindow(QMainWindow):
             self.kmeans_num_classes = int(self.kmeans_num_classes_input.text())
             self.kmeans_max_iterations = int(self.kmeans_max_iterations_input.text())
             self.kmeans_tolerance = float(self.kmeans_tolerance_input.text())
-
+            self.segmentation_labels[0].points_number = self.kmeans_num_classes
             # Validate the parameters
             if self.kmeans_num_classes <= 0 or self.kmeans_max_iterations <= 0 or self.kmeans_tolerance < 0:
                 raise ValueError("Parameters must be positive.")
@@ -326,11 +343,25 @@ class MainWindow(QMainWindow):
         Handle changes in the Region Growing parameters and update the input fields accordingly.
         """
         try:
-            self.region_growing_seeds = int(self.region_growing_seeds.text())
-            self.region_growing_threshold = int(self.region_growing_threshold.text())
+            self.region_growing_seeds = int(self.region_growing_seeds_input.text())
+            self.region_growing_threshold = int(self.region_growing_threshold_input.text())
             self.segmentation_labels[0].points_number = self.region_growing_seeds
             # Validate the parameters
             if self.region_growing_seeds <= 0 or self.region_growing_threshold < 0:
+                raise ValueError("Parameters must be positive.")
+
+        except ValueError:
+            print("Error: Invalid parameters. Please enter positive values.")
+            return
+
+    def set_agg_params(self):
+        """
+        Handle changes in the Agglomerative Clustering parameters and update the input fields accordingly.
+        """
+        try:
+            self.agg_num_classes = int(self.agg_num_classes_input.text())
+            # Validate the parameters
+            if self.agg_num_classes <= 0:
                 raise ValueError("Parameters must be positive.")
 
         except ValueError:

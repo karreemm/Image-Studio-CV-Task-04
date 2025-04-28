@@ -116,25 +116,25 @@ def apply_mean_shift_segmentation_to_image(image, bandwidth=20, threshold=1):
     segmented_pixels = centers[labels]
     segmented_image = segmented_pixels.reshape((height, width)).astype(np.uint8)
     
-    unique_colors = [
-            (255, 0, 0),     
-            (0, 255, 0),     
-            (0, 0, 255),     
-            (255, 255, 0),   
-            (255, 0, 255),   
-            (0, 255, 255),   
-            (255, 128, 0),   
-            (128, 0, 255),   
-            (0, 128, 0),     
-            (128, 128, 128)  
-        ]
+    # unique_colors = [
+    #         (255, 0, 0),     
+    #         (0, 255, 0),     
+    #         (0, 0, 255),     
+    #         (255, 255, 0),   
+    #         (255, 0, 255),   
+    #         (0, 255, 255),   
+    #         (255, 128, 0),   
+    #         (128, 0, 255),   
+    #         (0, 128, 0),     
+    #         (128, 128, 128)  
+    #     ]
     
-    # Create an image where each segment has a unique color
-    colored_labels = np.zeros((height * width, 3), dtype=np.uint8)
-    for i, color in enumerate(unique_colors):
-        colored_labels[labels == i] = color
+    # # Create an image where each segment has a unique color
+    # colored_labels = np.zeros((height * width, 3), dtype=np.uint8)
+    # for i, color in enumerate(unique_colors):
+    #     colored_labels[labels == i] = color
     
-    colored_segmented_image = colored_labels.reshape((height, width, 3))
+    # colored_segmented_image = colored_labels.reshape((height, width, 3))
 
-    return colored_segmented_image
+    return segmented_image
 

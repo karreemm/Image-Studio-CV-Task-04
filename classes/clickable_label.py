@@ -6,7 +6,7 @@ class ClickableLabel(QLabel):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.points = []
-        self.points_number = 0
+        self.points_number = 3
 
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton and self.pixmap() is not None:
@@ -26,11 +26,9 @@ class ClickableLabel(QLabel):
             img_y = int(y * scale_y)
 
             print(f"Clicked at label ({x}, {y}), mapped to image ({img_x}, {img_y})")
-            if(len(self.points) < self.points_number):
-                self.points.append((img_x, img_y))
-            else:
+            if(len(self.points) >= self.points_number):
                 self.points.pop(0)
-                self.points.append((img_x, img_y))
+            self.points.append((img_x, img_y))
             self.update()
 
     def paintEvent(self, event):

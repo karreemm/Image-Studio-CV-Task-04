@@ -9,6 +9,7 @@ from classes.optimal_thresholding import OptimalThresholding
 from classes.otsu_thresholding import OtsuThresholding
 from classes.spectral_thresholding import SpectralThresholding
 from classes.RegionGrowing import RegionGrowingSegmentation
+from classes.AgglomerativeClustering import AgglomerativeClustering
 class Controller():
     def __init__(self, segmentation_labels, thresholding_labels):
         self.input_image = Image() 
@@ -17,6 +18,7 @@ class Controller():
         self.thresholding_labels = thresholding_labels
         self.spectral_thresholding = SpectralThresholding() 
         self.region_growing = RegionGrowingSegmentation()
+        self.agg_cluster = AgglomerativeClustering()
     
     def browse_input_image(self, target="segmentation"):
         """
@@ -64,7 +66,7 @@ class Controller():
         seed_points = []
         for point in self.segmentation_labels[0].get_points():
             seed_points.append((point[1], point[0]))
-        self.output_image.input_image = kmeans_image(image_L_channel , num_classes , seed_points , tolerance=tolerance , max_iter=max_iter)
+        self.output_image.input_image = kmeans_image(image_L_channel , num_classes , seed_points , tolerance=tolerance , max_iterations=max_iter)
         output_kmeans_image_qpixmap = self.numpy_to_qpixmap(self.output_image.input_image)
         self.segmentation_labels[1].setPixmap(output_kmeans_image_qpixmap)
     
@@ -167,3 +169,11 @@ class Controller():
         self.update_label(self.segmentation_labels[1] , self.output_image.input_image)
         self.update_label(self.thresholding_labels[1] , self.output_image.input_image)
         self.segmentation_labels[0].clear_points()
+        self.segmentation_labels[1].clear_points()
+        
+        
+    def apply_agglomerative_clustering(self , classes_num):
+        grayscale_image = cv2.cvtColor(self.input_image.input_image, cv2.COLOR_RGB2GRAY)
+        self.output_image.input_image = self.agg_cluster.agglomerative_clustering_fast(grayscale_image , classes_num)
+        output_spectral_image_qpixmap = self.numpy_to_qpixmap(self.output_image.input_image)
+        self.segmentation_labels[1].setPixmap(output_spectral_image_qpixmap)

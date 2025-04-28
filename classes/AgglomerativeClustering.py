@@ -4,8 +4,8 @@ import cv2
 
 class AgglomerativeClustering:
 
-    def agglomerative_clustering_fast(image, n_clusters):
-        resized_image = cv2.resize(image, (30, 30)) 
+    def agglomerative_clustering_fast(self,image, n_clusters):
+        resized_image = cv2.resize(image, (20, 20)) 
         height, width = resized_image.shape
         pixels = []
 
@@ -45,15 +45,14 @@ class AgglomerativeClustering:
             
             D[i, i] = np.inf  # No self-merge
             
-        return clusters
 
+        segmented_img = np.zeros((height, width), dtype=np.uint8)
 
-# add this part at controller
-# segmented_img = np.zeros((h, w), dtype=np.uint8)
-
-# for cluster in clusters:
-#     intensity = np.mean([pixels[idx][0] for idx in cluster])  # Average intensity
-#     for idx in cluster:
-#         i, j = int(pixels[idx][1]), int(pixels[idx][2])
-#         segmented_img[i, j] = intensity
+        for cluster in clusters:
+            intensity = np.mean([pixels[idx][0] for idx in cluster])  # Average intensity
+            for idx in cluster:
+                i, j = int(pixels[idx][1]), int(pixels[idx][2])
+                segmented_img[i, j] = intensity
+        
+        return segmented_img
 
