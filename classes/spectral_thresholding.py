@@ -32,17 +32,22 @@ class SpectralThresholding:
             optimal_threshold = 0
             
             for t in range(256):
+
+                # calc probabilities for each class 
                 p1 = np.sum(smoothed_hist[:t+1])
                 p2 = np.sum(smoothed_hist[t+1:])
                 
                 if p1 == 0 or p2 == 0:
                     continue
                 
+                # calc means for each class
                 m1 = np.sum(pixel_range[:t+1] * smoothed_hist[:t+1]) / p1
                 m2 = np.sum(pixel_range[t+1:] * smoothed_hist[t+1:]) / p2
                 
+                # calc variance
                 variance = p1 * p2 * ((m1 - m2) ** 2)
                 
+                # Check if this is the best threshold
                 if variance > max_variance:
                     max_variance = variance
                     optimal_threshold = t
@@ -57,15 +62,19 @@ class SpectralThresholding:
             t_list = sorted(t_list)
             variance = 0
             
+            # get ranges for each class based on thresholds
             ranges = [(0, t_list[0])] + \
                     [(t_list[i], t_list[i+1]) for i in range(len(t_list)-1)] + \
                     [(t_list[-1], 256)]
                     
             for start, end in ranges:
+                # calc probabilities for each class
                 p_k = np.sum(smoothed_hist[start:end])
                 if p_k == 0:
                     continue
+                # calc means for each class
                 m_k = np.sum(pixel_range[start:end] * smoothed_hist[start:end]) / p_k
+                # calc variance
                 variance += p_k * ((m_k - mg) ** 2)
                 
             return variance
