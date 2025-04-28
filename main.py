@@ -229,6 +229,8 @@ class MainWindow(QMainWindow):
             print("Error: Invalid parameters. Please enter positive values.")
             return
 
+    
+    
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     window = MainWindow()

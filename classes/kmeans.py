@@ -122,44 +122,41 @@ def update_centroids(data, labels, k):
 #     return clustered_image, centroids, iterations
 
 
-def apply_specific_colors(image, labels, specific_colors):
+def apply_specific_colors(height , width, labels, specific_colors):
     """
-    Apply specific colors to each cluster.
+    Apply specific intensity values to each cluster (for 1-channel image).
     
     Parameters:
-    - image: original image
-    - labels: cluster labels for each pixel
-    - specific_colors: list of colors to apply to each cluster
+    - image: original single-channel image (height, width)
+    - labels: cluster labels for each pixel (1D array)
+    - specific_colors: list of intensities to apply to each cluster (0-255)
     
     Returns:
-    - colored_image: image with specific colors applied to each cluster
+    - colored_image: image with specific intensities applied to each cluster
     """
-    height, width, channels = image.shape
-    pixels = image.reshape(-1, channels)
     k = len(specific_colors)
     
     # Convert specific_colors to numpy array if it's not already
     specific_colors = np.array(specific_colors)
-    
-    # Apply specific colors to each pixel based on its label
+
+    # Apply specific intensities based on labels
     colored_pixels = np.array([specific_colors[label % k] for label in labels])
-    
     # Reshape back to original image dimensions
-    colored_image = colored_pixels.reshape(height, width, channels)
-    
+    colored_image = colored_pixels.reshape(height, width,3)
+
     # Ensure the values are in valid image range [0, 255]
     colored_image = np.clip(colored_image, 0, 255).astype(np.uint8)
-    
+
     return colored_image
 
-def generate_unique_random_colors(n):
-    colors = set()
+# def generate_unique_random_colors(n):
+#     colors = set()
     
-    while len(colors) < n:
-        color = tuple(random.randint(0, 255) for _ in range(3))
-        colors.add(color)
+#     while len(colors) < n:
+#         color = tuple(random.randint(0, 255) for _ in range(3))
+#         colors.add(color)
     
-    return [list(c) for c in colors]
+#     return [list(c) for c in colors]
 
 def kmeans_image(image, k, specific_colors=None, max_iterations=20, tolerance=0.001):
     """
@@ -186,10 +183,9 @@ def kmeans_image(image, k, specific_colors=None, max_iterations=20, tolerance=0.
             [255, 255, 0],  # Yellow
             [255, 0, 255]   # Magenta
         ]    
-    # Reshape image to a 2D array of pixels
-    height, width, channels = image.shape
-    pixels = image.reshape(-1, channels)
-    
+    height, width = image.shape
+    # Reshape L channel to a 1D array of pixels
+    pixels = image.reshape(-1, 1) 
     # Initialize centroids
     centroids = initialize_centroids(pixels, k)
     
@@ -221,14 +217,14 @@ def kmeans_image(image, k, specific_colors=None, max_iterations=20, tolerance=0.
     
     # If specific colors are provided, use them, otherwise use centroids
     if specific_colors is not None:
-        colored_image = apply_specific_colors(image, labels, specific_colors)
+        segmented_image = apply_specific_colors(height ,width, labels, specific_colors)
     else:
-        # Replace each pixel with its cluster's centroid color
-        clustered_pixels = np.array([centroids[label] for label in labels])
-        colored_image = clustered_pixels.reshape(height, width, channels)
-        colored_image = np.clip(colored_image, 0, 255).astype(np.uint8)
+        # Replace each pixel with its cluster's centroid L value
+        clustered_pixels = np.array([centroids[label][0] for label in labels])
+        segmented_image = clustered_pixels.reshape(height, width)
+        segmented_image = np.clip(segmented_image, 0, 255).astype(np.uint8)
     
-    return colored_image
+    return segmented_image
 
 
 # # Example usage

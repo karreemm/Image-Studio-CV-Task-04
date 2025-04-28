@@ -73,7 +73,7 @@ def mouse_callback(event, x, y, flags, param):
 
 def main():
     # Load the image
-    image_path = 'D:\\Computer Vision\\Image-Studio-CV-Task-04\\Final Test Data\\cameraman.bmp'  # <-- Change this to your image path
+    image_path = './Final Test Data/cameraman.bmp'  # <-- Change this to your image path
     image_bgr = cv2.imread(image_path)  # Read normally (in BGR)
     image = cv2.cvtColor(image_bgr, cv2.COLOR_BGR2Luv)
     L, U, V = cv2.split(image)

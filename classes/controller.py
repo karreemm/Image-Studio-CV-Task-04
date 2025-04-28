@@ -44,20 +44,29 @@ class Controller():
             self.update_label(self.segmentation_labels[0], self.input_image.input_image)  # Input image area for segmentation
 
     def numpy_to_qpixmap(self, image_array):
-        """Convert NumPy array to QPixmap"""
-        image_array = cv2.cvtColor(image_array, cv2.COLOR_BGR2RGB)
-        height, width, channels = image_array.shape
-        bytes_per_line = channels * width
-        qimage = QImage(image_array.data, width, height, bytes_per_line, QImage.Format_RGB888)
+        """Convert NumPy array (RGB or Grayscale) to QPixmap."""
+        if len(image_array.shape) == 3:  # RGB image
+            height, width, channels = image_array.shape
+            bytes_per_line = channels * width
+            qimage = QImage(image_array.data, width, height, bytes_per_line, QImage.Format_RGB888)
+        else:  # Grayscale image
+            height, width = image_array.shape
+            bytes_per_line = width  # Only 1 byte per pixel
+            qimage = QImage(image_array.data, width, height, bytes_per_line, QImage.Format_Grayscale8)
+
         return QPixmap.fromImage(qimage)
     
     def apply_kmeans_segmentation(self):
-        self.output_image.input_image = kmeans_image(self.input_image.input_image , 3)
+        image = cv2.cvtColor(self.input_image.input_image, cv2.COLOR_RGB2LUV)
+        image_L_channel = image[:,:,0] 
+        self.output_image.input_image = kmeans_image(image_L_channel , 3)
         output_kmeans_image_qpixmap = self.numpy_to_qpixmap(self.output_image.input_image)
         self.segmentation_labels[1].setPixmap(output_kmeans_image_qpixmap)
     
     def apply_mean_shift_segmentation(self):
-        self.output_image.input_image = apply_mean_shift_segmentation_to_image(self.input_image.input_image)
+        image = cv2.cvtColor(self.input_image.input_image, cv2.COLOR_RGB2LUV)
+        image_L_channel = image[:,:,0] 
+        self.output_image.input_image = apply_mean_shift_segmentation_to_image(image_L_channel)
         output_mean_shift_image_qpixmap = self.numpy_to_qpixmap(self.output_image.input_image)
         self.segmentation_labels[1].setPixmap(output_mean_shift_image_qpixmap)
     

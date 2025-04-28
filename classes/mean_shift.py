@@ -106,35 +106,35 @@ def apply_mean_shift_segmentation_to_image(image, bandwidth=20, threshold=1):
         Segmented image where each pixel is replaced by its cluster center
     """
     # Reshape the image to a 2D array of pixels
-    height, width, channels = image.shape
-    pixels = image.reshape((-1, channels)).astype(np.float32)
+    height, width = image.shape
+    pixels = image.reshape((-1, 1)).astype(np.float32)
     
     # Apply mean shift segmentation
     centers, labels = mean_shift_segmentation(pixels, bandwidth=bandwidth, threshold=threshold)
     
     # Create segmented image
     segmented_pixels = centers[labels]
-    segmented_image = segmented_pixels.reshape((height, width, channels)).astype(np.uint8)
+    segmented_image = segmented_pixels.reshape((height, width)).astype(np.uint8)
     
-    # unique_colors = [
-    #         (255, 0, 0),     
-    #         (0, 255, 0),     
-    #         (0, 0, 255),     
-    #         (255, 255, 0),   
-    #         (255, 0, 255),   
-    #         (0, 255, 255),   
-    #         (255, 128, 0),   
-    #         (128, 0, 255),   
-    #         (0, 128, 0),     
-    #         (128, 128, 128)  
-    #     ]
+    unique_colors = [
+            (255, 0, 0),     
+            (0, 255, 0),     
+            (0, 0, 255),     
+            (255, 255, 0),   
+            (255, 0, 255),   
+            (0, 255, 255),   
+            (255, 128, 0),   
+            (128, 0, 255),   
+            (0, 128, 0),     
+            (128, 128, 128)  
+        ]
     
-    # # Create an image where each segment has a unique color
-    # colored_labels = np.zeros((height * width, 3), dtype=np.uint8)
-    # for i, color in enumerate(unique_colors):
-    #     colored_labels[labels == i] = color
+    # Create an image where each segment has a unique color
+    colored_labels = np.zeros((height * width, 3), dtype=np.uint8)
+    for i, color in enumerate(unique_colors):
+        colored_labels[labels == i] = color
     
-    # colored_segmented_image = colored_labels.reshape((height, width, 3))
+    colored_segmented_image = colored_labels.reshape((height, width, 3))
 
-    return segmented_image
+    return colored_segmented_image
 
