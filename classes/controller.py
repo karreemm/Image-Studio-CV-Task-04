@@ -8,7 +8,7 @@ from classes.mean_shift import apply_mean_shift_segmentation_to_image
 from classes.optimal_thresholding import OptimalThresholding 
 from classes.otsu_thresholding import OtsuThresholding
 from classes.spectral_thresholding import SpectralThresholding
-
+from classes.RegionGrowing import RegionGrowingSegmentation
 class Controller():
     def __init__(self, segmentation_labels, thresholding_labels):
         self.input_image = Image() 
@@ -16,6 +16,7 @@ class Controller():
         self.segmentation_labels = segmentation_labels
         self.thresholding_labels = thresholding_labels
         self.spectral_thresholding = SpectralThresholding() 
+        self.region_growing = RegionGrowingSegmentation()
     
     def browse_input_image(self, target="segmentation"):
         """
@@ -147,3 +148,10 @@ class Controller():
         label.setPixmap(pixmap)
         label.setScaledContents(True)
 
+    def apply_region_growing(self):
+        seed_points = self.segmentation_labels[0].get_points()
+        image = cv2.cvtColor(self.input_image.input_image, cv2.COLOR_RGB2LUV)
+        image_L_channel = image[:,:,0] 
+        self.output_image.input_image = self.region_growing.segment(image_L_channel , seed_points , 10)
+        output_mean_shift_image_qpixmap = self.numpy_to_qpixmap(self.output_image.input_image)
+        self.segmentation_labels[1].setPixmap(output_mean_shift_image_qpixmap)
