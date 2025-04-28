@@ -1051,7 +1051,7 @@ font-weight: bold;</string>
                         </spacer>
                        </item>
                        <item>
-                        <widget class="QLineEdit" name="sigmaInputSift">
+                        <widget class="QLineEdit" name="maxIterations">
                          <property name="maximumSize">
                           <size>
                            <width>100</width>
