@@ -79,10 +79,13 @@ class SpectralThresholding:
                 
             return variance
         
-        # Initialize with peaks from smoothed histogram
+        # Initialize with peaks from smoothed histogram as promising thresholds
         peaks = []
         for i in range(1, 255):
+            # Find local maxima (peaks) in the smoothed histogram
             if smoothed_hist[i] > smoothed_hist[i-1] and smoothed_hist[i] > smoothed_hist[i+1]:
+
+                # Filters peaks by their prominence (height relative to surrounding minima) to avoid minor fluctuations
                 prominence = min(
                     smoothed_hist[i] - np.min(smoothed_hist[max(0, i-10):i]),
                     smoothed_hist[i] - np.min(smoothed_hist[i+1:min(256, i+11)])
@@ -92,6 +95,7 @@ class SpectralThresholding:
         
         # Use top num_classes-1 peaks as initial thresholds
         if len(peaks) >= num_classes-1:
+            # Sort peaks by height
             peak_heights = [smoothed_hist[p] for p in peaks]
             indices = np.argsort(peak_heights)[-(num_classes-1):]
             thresholds = sorted([peaks[i] for i in indices])
@@ -100,10 +104,12 @@ class SpectralThresholding:
             step = 256 // num_classes
             thresholds = [i * step for i in range(1, num_classes)]
         
-        # Refine thresholds
+        # Refine thresholds for 5 iterations
         for _ in range(5):
             for i in range(len(thresholds)):
+                # Calculate variance for current threshold
                 best_t = thresholds[i]
+                # searching nearby values (±10) that maximize the between-class variance
                 for t in range(max(0, best_t-10), min(255, best_t+10)):
                     temp_thresholds = thresholds.copy()
                     temp_thresholds[i] = t
@@ -114,7 +120,6 @@ class SpectralThresholding:
                         final_thresholds = temp_thresholds.copy()
                 thresholds[i] = best_t
         
-        # Return segmented image directly
         return self.segment_image(image, final_thresholds)
     
 
@@ -133,16 +138,17 @@ class SpectralThresholding:
             raise ValueError("Window size must be at least 3")
             
         result = np.zeros_like(image, dtype=np.float32)
+        # Calculate padding size
         pad_size = window_size // 2
         
-        # Pad image for window analysis
+        # Pad image for window analysis with reflection to avoid edge effects
         padded = cv2.copyMakeBorder(image, pad_size, pad_size, pad_size, pad_size,
                                 cv2.BORDER_REFLECT)
         
         # Process each pixel with its local window
         for i in range(pad_size, padded.shape[0] - pad_size):
             for j in range(pad_size, padded.shape[1] - pad_size):
-                # Extract local window
+                # Extract local window centered at (i, j) our pixel of interest
                 window = padded[i-pad_size:i+pad_size+1, j-pad_size:j+pad_size+1]
                 
                 # Compute histogram for window
@@ -154,21 +160,23 @@ class SpectralThresholding:
                 peak_heights = []
                 
                 for k in range(1, 255):
+                    # Find local maxima (peaks) in the smoothed histogram
                     if smoothed_hist[k] > smoothed_hist[k-1] and smoothed_hist[k] > smoothed_hist[k+1]:
                         peaks.append(k)
                         peak_heights.append(smoothed_hist[k])
                 
                 # Select strongest peaks and find thresholds
                 if len(peaks) >= num_classes:
+                    # Sort peaks by height
                     indices = np.argsort(peak_heights)[-num_classes:]
                     peaks = sorted([peaks[idx] for idx in indices])
                     
-                    # Find valleys between peaks
+                    # Find minima between peaks to determine thresholds
                     thresholds = []
                     for k in range(len(peaks)-1):
                         start, end = peaks[k], peaks[k+1]
-                        valley_idx = start + np.argmin(smoothed_hist[start:end+1])
-                        thresholds.append(valley_idx)
+                        minima_between_peaks_idx = start + np.argmin(smoothed_hist[start:end+1])
+                        thresholds.append(minima_between_peaks_idx)
                     
                     # Assign class label based on thresholds
                     pixel_value = image[i-pad_size, j-pad_size]
@@ -188,13 +196,17 @@ class SpectralThresholding:
         segmented = np.zeros_like(image)
         thresholds = sorted(thresholds)
         
+        # Iterate through thresholds and assign class labels
+        # 0 for background, 1 for first class, ..., len(thresholds) for last class
         for i, t in enumerate(thresholds):
             if i == 0:
                 segmented[image <= t] = 0
             else:
                 segmented[(image > thresholds[i-1]) & (image <= t)] = i
         
+        # Assigns the highest class label to pixels above the last threshold
         segmented[image > thresholds[-1]] = len(thresholds)
+        
         return segmented
     
 
