@@ -40,7 +40,7 @@ class MainWindow(QMainWindow):
         self.segmentation_output_image_frame = self.findChild(QFrame , "segmentationOutputFrame")
         
         segmentation_frames = [self.segmentation_input_image_frame , self.segmentation_output_image_frame]
-        segmentation_labels = []
+        self.segmentation_labels = []
         
         for frame in segmentation_frames:
 
@@ -49,16 +49,40 @@ class MainWindow(QMainWindow):
             layout.addWidget(label)
             frame.setLayout(layout)
             label.setScaledContents(True)
-            segmentation_labels.append(label)
+            self.segmentation_labels.append(label)
             
         # Kmeans parameters and apply button
         self.apply_kmeans_button = self.findChild(QPushButton, "kMeansApply")
         self.apply_kmeans_button.clicked.connect(self.apply_kmeans)
+        self.kmeans_num_classes_input = self.findChild(QLineEdit, "numOfClassesKMean")
+        self.kmeans_num_classes_input.textChanged.connect(self.handle_kmeans_params)
+        self.kmeans_num_classes_input.setText("3")
+        self.kmeans_num_classes = 3
+        
+        self.kmeans_max_iterations_input = self.findChild(QLineEdit, "sigmaInputSift")
+        self.kmeans_max_iterations_input.textChanged.connect(self.handle_kmeans_params)
+        self.kmeans_max_iterations_input.setText("20")
+        self.kmeans_max_iterations = 20
+        
+        self.kmeans_tolerance_input = self.findChild(QLineEdit, "tolerance")
+        self.kmeans_tolerance_input.textChanged.connect(self.handle_kmeans_params)
+        self.kmeans_tolerance_input.setText("0.01")
+        self.kmeans_tolerance = 0.01
         
         # Mean Shift parameters and apply button
         self.apply_mean_shift_button = self.findChild(QPushButton , "meansShiftMethodsApply")
         self.apply_mean_shift_button.clicked.connect(self.apply_mean_shift)
 
+        self.mean_shift_bandwidth_input = self.findChild(QLineEdit , "bandwidthMeanShift")
+        self.mean_shift_bandwidth_input.setText("1.0")
+        self.mean_shift_bandwidth_input.textChanged.connect(self.handle_mean_shift_params)
+        self.mean_shift_bandwidth = 1.0
+        
+        self.mean_shift_threshold_input = self.findChild(QLineEdit , "thresholdMeanShift")
+        self.mean_shift_threshold_input.setText("0.01")
+        self.mean_shift_threshold_input.textChanged.connect(self.handle_mean_shift_params)
+        self.mean_shift_threshold = 0.01
+                
         # Optimal Thresholding Radio Buttons
         self.global_thresholding_radiobutton = self.findChild(QRadioButton, "globalThresholdingRadiobutton")
         self.local_thresholding_radiobutton = self.findChild(QRadioButton, "localThresholdingRadiobutton")
@@ -121,12 +145,22 @@ class MainWindow(QMainWindow):
         self.apply_region_growing_button = self.findChild(QPushButton , "regionGrowingApply")
         self.apply_region_growing_button.clicked.connect(self.apply_region_growing)
         
+        self.region_growing_seeds = self.findChild(QLineEdit , "numOfSeeds")
+        self.region_growing_seeds.setText("2")
+        self.region_growing_seeds.textChanged.connect(self.handle_region_growing_params)
+        self.region_growing_seeds = 2
+        
+        self.region_growing_threshold = self.findChild(QLineEdit , "thresholdRegionGrowing")
+        self.region_growing_threshold.setText("25")
+        self.region_growing_threshold.textChanged.connect(self.handle_region_growing_params)
+        self.region_growing_threshold = 25
+        
         # Initialize the reset button
         self.reset_button = self.findChild(QPushButton , "reset")
         self.reset_button.clicked.connect(self.reset_)       
         
         # Controller
-        self.controller = Controller(segmentation_labels, thresholding_labels)
+        self.controller = Controller(self.segmentation_labels, thresholding_labels)
         
     def handle_mode_pages(self):
         current_index = self.modesCombobox.currentIndex()
@@ -158,10 +192,10 @@ class MainWindow(QMainWindow):
             self.segmentationStackWidget.setCurrentIndex(3)
 
     def apply_kmeans(self):
-        self.controller.apply_kmeans_segmentation()
+        self.controller.apply_kmeans_segmentation(self.kmeans_num_classes , self.kmeans_tolerance , self.kmeans_max_iterations)
     
     def apply_mean_shift(self):
-        self.controller.apply_mean_shift_segmentation()
+        self.controller.apply_mean_shift_segmentation(self.mean_shift_bandwidth , self.mean_shift_threshold)
     
     def browse_image(self):
         """
@@ -249,10 +283,59 @@ class MainWindow(QMainWindow):
             return
 
     def apply_region_growing(self):
-        self.controller.apply_region_growing()
+        self.controller.apply_region_growing(self.region_growing_seeds , self.region_growing_threshold )
     
     def reset_(self):
         self.controller.reset()
+    
+    def handle_kmeans_params(self):
+        """
+        Handle changes in the KMeans parameters and update the input fields accordingly.
+        """
+        try:            
+            self.kmeans_num_classes = int(self.kmeans_num_classes_input.text())
+            self.kmeans_max_iterations = int(self.kmeans_max_iterations_input.text())
+            self.kmeans_tolerance = float(self.kmeans_tolerance_input.text())
+
+            # Validate the parameters
+            if self.kmeans_num_classes <= 0 or self.kmeans_max_iterations <= 0 or self.kmeans_tolerance < 0:
+                raise ValueError("Parameters must be positive.")
+
+        except ValueError:
+            print("Error: Invalid parameters. Please enter positive values.")
+            return
+    
+    def handle_mean_shift_params(self):
+        """
+        Handle changes in the Mean Shift parameters and update the input fields accordingly.
+        """
+        try:
+            self.mean_shift_bandwidth = float(self.mean_shift_bandwidth_input.text())
+            self.mean_shift_threshold = float(self.mean_shift_threshold_input.text())
+
+            # Validate the parameters
+            if self.mean_shift_bandwidth <= 0 or self.mean_shift_threshold < 0:
+                raise ValueError("Parameters must be positive.")
+
+        except ValueError:
+            print("Error: Invalid parameters. Please enter positive values.")
+            return
+    
+    def handle_region_growing_params(self):
+        """
+        Handle changes in the Region Growing parameters and update the input fields accordingly.
+        """
+        try:
+            self.region_growing_seeds = int(self.region_growing_seeds.text())
+            self.region_growing_threshold = int(self.region_growing_threshold.text())
+            self.segmentation_labels[0].points_number = self.region_growing_seeds
+            # Validate the parameters
+            if self.region_growing_seeds <= 0 or self.region_growing_threshold < 0:
+                raise ValueError("Parameters must be positive.")
+
+        except ValueError:
+            print("Error: Invalid parameters. Please enter positive values.")
+            return
     
 if __name__ == '__main__':
     app = QApplication(sys.argv)
